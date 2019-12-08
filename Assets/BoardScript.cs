@@ -23,6 +23,7 @@ public class BoardScript : MonoBehaviour {
     GameObject[][] boardGameObjects;
 
     uint turnNumber;    // Technically, this would be better named plyNumber, two plies per turn
+    static uint staticTurnNumber = 0; // Little hacky but I didn't want to risk screwing with this file too much
     bool gameStarted;
     bool gameEnded;
 
@@ -78,7 +79,7 @@ public class BoardScript : MonoBehaviour {
         }
         if (isPlayerTwoAI) {
             //System.Type scriptType = System.Reflection.Assembly.GetExecutingAssembly().GetType(playerTwoScriptClassName);
-            System.Type scriptType = System.Reflection.Assembly.GetExecutingAssembly().GetType("RandomAI");
+            System.Type scriptType = System.Reflection.Assembly.GetExecutingAssembly().GetType("TestBehavior");
             System.Object o = Activator.CreateInstance(scriptType);
             playerTwoScript = (AIScript)o;
             playerTwoScript.setColor(BoardSpace.WHITE);
@@ -98,6 +99,7 @@ public class BoardScript : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         if (!gameEnded) {
+            staticTurnNumber = turnNumber;
             if(turnNumber %2 == 0)
             {
                 tText.text = "Current Turn: Black";
@@ -263,6 +265,10 @@ public class BoardScript : MonoBehaviour {
         return changedSpaces;
     }
 
+    public static uint GetTurnNumber() {
+        return staticTurnNumber;
+    }
+
     public static List<KeyValuePair<int, int>> GetValidMoves(BoardSpace[][] board, uint turnNumber) {
         if(board.Length != 8 || board[0].Length != 8) {
             return null;
@@ -338,6 +344,10 @@ public class BoardScript : MonoBehaviour {
             print(boardRow);
             boardRow = "";
         }
+    }
+
+    public BoardSpace[][] getBoard() {
+        return board;
     }
 
 }
