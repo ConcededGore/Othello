@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestBehavior : AIScript {
+public class NaiveBehavior : AIScript {
 
     BoardSpace[][] board;
+    int ai = 0; // 0 attempts to minimize the opponents moves, 1 attempts to pick the best board spaces
 
     public override KeyValuePair<int, int> makeMove(List<KeyValuePair<int, int>> availableMoves, BoardSpace[][] currBoard) {
         board = currBoard;
 
         //testCheckSameColor();
 
-        if (BoardScript.GetTurnNumber() % 2 == 0) {
+        if (ai == 0) {
             return availableMoves[HMinimizeOpponentsMoves(availableMoves)];
         } else {
             int highScore = 0;
@@ -26,6 +27,10 @@ public class TestBehavior : AIScript {
             return availableMoves[highScore];
         }
         
+    }
+
+    public override void SetAI(int ai) {
+        this.ai = ai;
     }
 
     private int HMinimizeOpponentsMoves(List<KeyValuePair<int, int>> availableMoves) {

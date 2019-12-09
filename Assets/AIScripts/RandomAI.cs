@@ -18,4 +18,8 @@ public class RandomAI : AIScript {
         return availableMoves[Random.Range(0, availableMoves.Count)];
     }
 
+    public override void SetAI(int ai) {
+        throw new System.NotImplementedException();
+    }
+
 }
