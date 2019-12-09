@@ -43,6 +43,10 @@ public class BoardScript : MonoBehaviour {
     public Text tText;
     List<GameObject> possibleMovesArray;
     bool posMovesShown;
+
+    int aiToUseFor1 = 0;
+    int aiToUseFor2 = 0;
+
     void Awake() {
         //determines which side is player
 
@@ -60,7 +64,11 @@ public class BoardScript : MonoBehaviour {
          */
 
         isPlayerOneAI = true;
+        aiToUseFor1 = 0;
         isPlayerTwoAI = true;
+        aiToUseFor2 = 1;
+
+        
 
         /* For the calls to System.Reflection.Assembly.GetExecutingAssembly() below, enter the
          * string that names your .cs module that contains your AI code, such as is shown here
@@ -71,7 +79,7 @@ public class BoardScript : MonoBehaviour {
 
         possibleMovesArray = new List<GameObject>();
         if (isPlayerOneAI) {
-            System.Type scriptType = System.Reflection.Assembly.GetExecutingAssembly().GetType("TestBehavior");
+            System.Type scriptType = System.Reflection.Assembly.GetExecutingAssembly().GetType("NaiveBehavior");
             //System.Type scriptType = System.Reflection.Assembly.GetExecutingAssembly().GetType(playerOneScriptClassName);
             System.Object o = Activator.CreateInstance(scriptType);
             playerOneScript = (AIScript)o;
@@ -79,7 +87,7 @@ public class BoardScript : MonoBehaviour {
         }
         if (isPlayerTwoAI) {
             //System.Type scriptType = System.Reflection.Assembly.GetExecutingAssembly().GetType(playerTwoScriptClassName);
-            System.Type scriptType = System.Reflection.Assembly.GetExecutingAssembly().GetType("TestBehavior");
+            System.Type scriptType = System.Reflection.Assembly.GetExecutingAssembly().GetType("NaiveBehavior");
             System.Object o = Activator.CreateInstance(scriptType);
             playerTwoScript = (AIScript)o;
             playerTwoScript.setColor(BoardSpace.WHITE);

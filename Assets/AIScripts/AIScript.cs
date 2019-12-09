@@ -18,7 +18,7 @@ public abstract class AIScript {
     /// <param name="currentBoard"></param>
     /// <returns></returns>
     public abstract KeyValuePair<int, int> makeMove(List<KeyValuePair<int, int>> availableMoves, BoardSpace[][] currentBoard);
-
+    public abstract void SetAI(int ai);
     /// <summary>
     /// Displays the piece on the board.
     /// </summary>
