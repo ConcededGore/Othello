@@ -11,31 +11,63 @@ public class NaiveBehavior : AIScript {
         board = currBoard;
 
         //testCheckSameColor();
+        /*
+        if (availableMoves.Count == 0) {
+            Debug.Log("Make move has been passed an empty available moves");
+            return new KeyValuePair<int, int>(0, 0);
+        }
 
         if (ai == 0) {
             return availableMoves[HMinimizeOpponentsMoves(availableMoves)];
-        } else {
-            int highScore = 0;
-            int highScoreVal = 0;
-            int[] scores = HTileSelection(currBoard, availableMoves);
-            for (int i = 0; i < scores.Length; i++) {
-                if (scores[i] > highScoreVal) {
-                    highScore = i;
-                    highScoreVal = scores[i];
+        } else if (ai == 1) {
+            int highScore = rateMoveSelect(availableMoves[0]);
+            List<KeyValuePair<int, int>> potentialMoves = new List<KeyValuePair<int, int>>();
+
+            for (int i = 0; i < availableMoves.Count; i++) {
+                if (rateMoveSelect(availableMoves[i]) > highScore) {
+                    potentialMoves.Clear();
+                    potentialMoves.Add(availableMoves[i]);
+                } else if (rateMoveSelect(availableMoves[i]) == highScore) {
+                    potentialMoves.Add(availableMoves[i]);
                 }
             }
-            return availableMoves[highScore];
+
+            int rand = Mathf.FloorToInt(Random.Range(0, potentialMoves.Count));
+
+            return potentialMoves[rand];
+        } else if (ai == 2) {
+            int highScore = rateMoveSelect(availableMoves[0]);
+            List<KeyValuePair<int, int>> potentialMoves = new List<KeyValuePair<int, int>>();
+
+            for (int i = 0; i < availableMoves.Count; i++) {
+
+                //int score = rateMoveSelect
+
+                if (rateMoveSelect(availableMoves[i]) > highScore) {
+                    potentialMoves.Clear();
+                    potentialMoves.Add(availableMoves[i]);
+                }
+                else if (rateMoveSelect(availableMoves[i]) == highScore) {
+                    potentialMoves.Add(availableMoves[i]);
+                }
+            }
+
+            int rand = Mathf.FloorToInt(Random.Range(0, potentialMoves.Count));
+
         }
-        
+        */
     }
+
+
 
     public override void SetAI(int ai) {
         this.ai = ai;
     }
 
-    private int HMinimizeOpponentsMoves(List<KeyValuePair<int, int>> availableMoves) {
+    private int[] HMinimizeOpponentsMoves(List<KeyValuePair<int, int>> availableMoves) {
 
         List<Vector2> enemyMoves = new List<Vector2>();
+        int[] retval = new int[availableMoves.Count];
 
         for (int i = 0; i < availableMoves.Count; i++) {
             KeyValuePair<int, int> temp = availableMoves[i];
@@ -46,22 +78,78 @@ public class NaiveBehavior : AIScript {
             //Debug.Log(BoardScript.GetTurnNumber());
             tempBoard[tempKey][tempValue] = getColor(BoardScript.GetTurnNumber());
             enemyMoves.Add(new Vector2(i, BoardScript.GetValidMoves(tempBoard, BoardScript.GetTurnNumber() + 1).Count));
+            retval[i] = enemyMoves.Count;
             //Debug.Log(enemyMoves[i].x + " " + enemyMoves[i].y);
             tempBoard[tempKey][tempValue] = BoardSpace.EMPTY;
         }
 
+        return retval;
+    }
+
+    // Rates a specific tile from 0-100 based on the current board state
+    private int rateMoveSelect(List<KeyValuePair<int, int>> availableMoves, KeyValuePair<int, int> KVP) {
+        int[][] boardScores = getBoardScores();
+
+        int[] moveScores = new int[availableMoves.Count];
         int retval = 0;
-        int retvalVal = int.MaxValue;
-        for (int i = 0; i < enemyMoves.Count; i++) {
-            if (enemyMoves[i].y < retvalVal) {
-                retval = (int)enemyMoves[i].x;
-                retvalVal = (int)enemyMoves[i].y;
+        int move = 0;
+
+        for (int i = 0; i < availableMoves.Count; i++) {
+            if (availableMoves[i].Key == KVP.Key && availableMoves[i].Value == KVP.Value) {
+                move = i;
+                break;
             }
         }
 
-        return retval; // THIS CURRENTLY RETURN THE MOVE NUMBER THAT MINIMIZES THE OPPONENTS MOVES JUST SO THAT IT COULD PLAY, THIS WILL HAVE TO BE CHANGED BEFORE MONDAY
+        if (CompletesEdge(KVP, (uint)color)) {
+            retval = 100;
+        }
+        else {
+            retval = boardScores[KVP.Key][KVP.Value] * 25;
+        }
+
+        moveScores = HMinimizeOpponentsMoves(availableMoves);
+
+        int highMoves = 0;
+        int lowMoves = int.MaxValue;
+
+        for (int i = 0; i < moveScores.Length; i++) {
+            if (moveScores[i] > highMoves) {
+                highMoves = moveScores[i];
+            }
+            if (moveScores[i] < lowMoves) {
+                lowMoves = moveScores[i];
+            }
+        }
+
+        highMoves -= lowMoves;
+        int score = moveScores[move] - lowMoves;
+
+        int temp = (100 * score / highMoves);
+
+        temp = 100 - temp;
+
+        retval += temp;
+
+        return retval;
     }
 
+    private int[][] getBoardScores() {
+
+        int[][] retval = new int[8][] {
+            new int[8] {4,-3,2,2,2,2,-3,4},
+            new int[8] {-3,-4,-1,-1,-1,-1,-4,-3},
+            new int[8] {2,-1,1,0,0,1,-1,2},
+            new int[8] {2,-1,0,1,1,0,-1,2},
+            new int[8] {2,-1,0,1,1,0,-1,2},
+            new int[8] {2,-1,1,0,0,1,-1,2},
+            new int[8] {-3,-4,-1,-1,-1,-1,-4,-3},
+            new int[8] {4,-3,2,2,2,2,-3,4}
+        };
+
+        return retval;
+    }
+    /*
     private int[] HTileSelection(BoardSpace[][] board, List<KeyValuePair<int, int>> availableMoves) {
         int[] retval = new int[availableMoves.Count];
         for (int i = 0; i < availableMoves.Count; i++) {
@@ -91,7 +179,7 @@ public class NaiveBehavior : AIScript {
 
         return retval;
     }
-
+    */
     private BoardSpace getColor(uint turn) {
         if (turn % 2 == 0) {
             return BoardSpace.BLACK;
@@ -107,7 +195,7 @@ public class NaiveBehavior : AIScript {
         }
         return false;
     }
-
+/*
     private bool isXTile(KeyValuePair<int, int> KVP) {
         if (KVP.Key == 1 && (KVP.Value == 1 || KVP.Value == 6)) {
             return true;
@@ -137,7 +225,7 @@ public class NaiveBehavior : AIScript {
         }
         return true;
     }
-
+    */ // Tests that are no longer needed
     // THIS ASSUMES THAT BLACK HAS EVEN TURN # AND WHITE HAS ODD
     private bool CompletesEdge(KeyValuePair<int, int> KVP, uint turn) {
         BoardSpace color = (turn % 2 == 0) ? BoardSpace.BLACK : BoardSpace.WHITE;
