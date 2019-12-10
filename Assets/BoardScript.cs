@@ -84,6 +84,7 @@ public class BoardScript : MonoBehaviour {
             System.Object o = Activator.CreateInstance(scriptType);
             playerOneScript = (AIScript)o;
             playerOneScript.setColor(BoardSpace.BLACK);
+            playerOneScript.SetAI(aiToUseFor1);
         }
         if (isPlayerTwoAI) {
             //System.Type scriptType = System.Reflection.Assembly.GetExecutingAssembly().GetType(playerTwoScriptClassName);
@@ -91,6 +92,7 @@ public class BoardScript : MonoBehaviour {
             System.Object o = Activator.CreateInstance(scriptType);
             playerTwoScript = (AIScript)o;
             playerTwoScript.setColor(BoardSpace.WHITE);
+            playerTwoScript.SetAI(aiToUseFor2);
         }
 
         InitBoard();
