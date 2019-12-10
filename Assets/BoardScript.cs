@@ -63,10 +63,10 @@ public class BoardScript : MonoBehaviour {
          * to change who-plays-what and which AI to use to avoid having to change these manually.
          */
 
-        isPlayerOneAI = true;
+        isPlayerOneAI = false;
         aiToUseFor1 = 0;
         isPlayerTwoAI = true;
-        aiToUseFor2 = 1;
+        aiToUseFor2 = 0;
 
         
 
