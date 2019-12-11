@@ -27,6 +27,4 @@ public abstract class AIScript {
         this.color = color;
     }
 
-
-
 }

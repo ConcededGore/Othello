@@ -66,6 +66,7 @@
     <Compile Include="Assets\AIScripts\NaiveBehavior.cs" />
     <Compile Include="Assets\AIScripts\Negamax.cs" />
     <Compile Include="Assets\AIScripts\RandomAI.cs" />
+    <Compile Include="Assets\AIScripts\SmartBehavior.cs" />
     <Compile Include="Assets\BoardScript.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/Users/Conce/OneDrive/Desktop/Othello/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
