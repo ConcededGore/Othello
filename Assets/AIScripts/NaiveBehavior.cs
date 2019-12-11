@@ -6,59 +6,89 @@ public class NaiveBehavior : AIScript {
 
     BoardSpace[][] board;
     int ai = 0; // 0 attempts to minimize the opponents moves, 1 attempts to pick the best board spaces
+    public uint maxDepth = 5;
+    int colorNum;
 
     public override KeyValuePair<int, int> makeMove(List<KeyValuePair<int, int>> availableMoves, BoardSpace[][] currBoard) {
         board = currBoard;
 
-        //testCheckSameColor();
-        /*
-        if (availableMoves.Count == 0) {
-            Debug.Log("Make move has been passed an empty available moves");
-            return new KeyValuePair<int, int>(0, 0);
-        }
+        if (color == BoardSpace.BLACK)
+            colorNum = -1;
+        else
+            colorNum = 1;
+        KeyValuePair<int, int> best;
+        int bestScore = -100000000;
+        foreach (KeyValuePair<int, int> n in availableMoves)
+        {
+            Debug.Log("iteration start");
+            BoardSpace[][] nodeCopy = (BoardSpace[][])board.Clone();
+            if (colorNum == -1)
+                nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
+            else
+                nodeCopy[n.Value][n.Key] = BoardSpace.WHITE;
 
-        if (ai == 0) {
-            return availableMoves[HMinimizeOpponentsMoves(availableMoves)];
-        } else if (ai == 1) {
-            int highScore = rateMoveSelect(availableMoves[0]);
-            List<KeyValuePair<int, int>> potentialMoves = new List<KeyValuePair<int, int>>();
-
-            for (int i = 0; i < availableMoves.Count; i++) {
-                if (rateMoveSelect(availableMoves[i]) > highScore) {
-                    potentialMoves.Clear();
-                    potentialMoves.Add(availableMoves[i]);
-                } else if (rateMoveSelect(availableMoves[i]) == highScore) {
-                    potentialMoves.Add(availableMoves[i]);
-                }
+            //simulate the changes the move would result in
+            List<KeyValuePair<int, int>> simulatedChanges = BoardScript.GetPointsChangedFromMove(nodeCopy, BoardScript.GetTurnNumber(), n.Key, n.Value);
+            Debug.Log(simulatedChanges);
+            foreach (KeyValuePair<int, int> spot in simulatedChanges)
+            {
+                if (nodeCopy[n.Value][n.Key] == BoardSpace.BLACK)
+                    nodeCopy[n.Value][n.Key] = BoardSpace.WHITE;
+                else
+                    nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
             }
-
-            int rand = Mathf.FloorToInt(Random.Range(0, potentialMoves.Count));
-
-            return potentialMoves[rand];
-        } else if (ai == 2) {
-            int highScore = rateMoveSelect(availableMoves[0]);
-            List<KeyValuePair<int, int>> potentialMoves = new List<KeyValuePair<int, int>>();
-
-            for (int i = 0; i < availableMoves.Count; i++) {
-
-                //int score = rateMoveSelect
-
-                if (rateMoveSelect(availableMoves[i]) > highScore) {
-                    potentialMoves.Clear();
-                    potentialMoves.Add(availableMoves[i]);
-                }
-                else if (rateMoveSelect(availableMoves[i]) == highScore) {
-                    potentialMoves.Add(availableMoves[i]);
-                }
-            }
-
-            int rand = Mathf.FloorToInt(Random.Range(0, potentialMoves.Count));
-
+            Debug.Log("starting negamax traversal");
+            int value = negamax(nodeCopy, 0, colorNum);
+            if (value >= bestScore)
+                best = n;
         }
-        */
+        Debug.Log("best is x:" + best.Value + " y:" + best.Key);
+        return best;
     }
 
+    private int negamax(BoardSpace[][] node, uint depth, int color)
+    {
+        Debug.Log("negamax function start");
+        if (depth == maxDepth - 2)
+        {
+            int retVal = -1000000;
+            List<KeyValuePair<int, int>> moves = BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber() + maxDepth);
 
+            foreach(KeyValuePair<int,int> n in moves)
+            {
+                int temp = rateMoveSelect(moves, n);
+                if (temp > retVal)
+                    retVal = temp;
+            }
+            return retVal;
+        }
+        else
+        {
+            int value = -100000;
+            //go through each valid move for this board state
+            foreach (KeyValuePair<int, int> n in BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber()))
+            {
+                BoardSpace[][] nodeCopy = (BoardSpace[][])node.Clone();
+                if (color == -1)
+                    nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
+                else
+                    nodeCopy[n.Value][n.Key] = BoardSpace.WHITE;
+
+                //simulate the changes each move would result in
+                List<KeyValuePair<int, int>> simulatedChanges = BoardScript.GetPointsChangedFromMove(nodeCopy, BoardScript.GetTurnNumber() + depth, n.Key, n.Value);
+                foreach (KeyValuePair<int, int> spot in simulatedChanges)
+                {
+                    if (nodeCopy[spot.Value][spot.Key] == BoardSpace.BLACK)
+                        nodeCopy[spot.Value][spot.Key] = BoardSpace.WHITE;
+                    else
+                        nodeCopy[spot.Value][spot.Key] = BoardSpace.BLACK;
+                }
+                //recurse
+                value = Mathf.Max(value, -1 * negamax(nodeCopy, depth + 1, -1 * color));
+            }
+            return value;
+        }
+    }
 
     public override void SetAI(int ai) {
         this.ai = ai;

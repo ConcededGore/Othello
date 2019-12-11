@@ -246,6 +246,7 @@ public class BoardScript : MonoBehaviour {
         //determines how much a move changed the overall point value
         BoardSpace enemyColor = turnNumber % 2 == 0 ? BoardSpace.WHITE : BoardSpace.BLACK;
         BoardSpace ourColor = turnNumber % 2 == 0 ? BoardSpace.BLACK : BoardSpace.WHITE;
+        //Debug.Log(board.Length + " " + board[0].Length + " " + board[y][x]  + " " + y + " " + x);
         if (board.Length != 8 || board[0].Length != 8 || y < 0 || y >= 8 || x < 0 || x >= 8 || board[y][x] != ourColor) {
             return null;
         }

@@ -7,10 +7,16 @@ public class Negamax : AIScript
 
     public uint maxDepth = 5;
     private int colorNum;
+    int ai;
     // Start is called before the first frame update
     void Start()
     {
         
+    }
+
+    public override void SetAI(int ai)
+    {
+        this.ai = ai;
     }
 
     // Update is called once per frame
@@ -36,7 +42,7 @@ public class Negamax : AIScript
                 nodeCopy[n.Key][n.Value] = BoardSpace.WHITE;
 
             //simulate the changes the move would result in
-            List<KeyValuePair<int, int>> simulatedChanges = BoardScript.GetPointsChangedFromMove(nodeCopy, BoardScript.GetTurnNumber() + depth, n.Key, n.Value);
+            List<KeyValuePair<int, int>> simulatedChanges = BoardScript.GetPointsChangedFromMove(nodeCopy, BoardScript.GetTurnNumber(), n.Key, n.Value);
             foreach (KeyValuePair<int, int> spot in simulatedChanges)
             {
                 if (nodeCopy[spot.Key][spot.Value] == BoardSpace.BLACK)
@@ -58,11 +64,6 @@ public class Negamax : AIScript
             //return SEF(node)
             return 1;
         }
-        /*else if(BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber()).Count == 0)//if list is empty, bail
-        {
-            //return very negative number
-            return -1000000;
-        }*/
         else
         {
             int value = -100000;
