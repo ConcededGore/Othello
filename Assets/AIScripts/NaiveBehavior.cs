@@ -234,6 +234,28 @@ public class NaiveBehavior : AIScript {
         return retval;
     }
 
+    private int NaiveRateMoveSelect(List<KeyValuePair<int, int>> availableMoves, KeyValuePair<int, int> KVP) {
+        int[][] boardScores = getBoardScores();
+
+        int[] moveScores = new int[availableMoves.Count];
+        int retval = 0;
+        int move = 0;
+
+        for (int i = 0; i < availableMoves.Count; i++) {
+            if (availableMoves[i].Key == KVP.Key && availableMoves[i].Value == KVP.Value) {
+                move = i;
+                break;
+            }
+        }
+
+        if (CompletesEdge(KVP, (uint)color)) {
+            return 100;
+        }
+        else {
+            return boardScores[KVP.Key][KVP.Value] * 25;
+        }
+    }
+
     private int[][] getBoardScores() {
 
         int[][] retval = new int[8][] {
@@ -290,43 +312,44 @@ public class NaiveBehavior : AIScript {
     private bool isCorner(KeyValuePair<int, int> KVP) {
         if (KVP.Key == 0 && (KVP.Value == 0 || KVP.Value == 7)) {
             return true;
-        } else if (KVP.Key == 7 && (KVP.Value == 0 || KVP.Value == 7)) {
+        }
+        else if (KVP.Key == 7 && (KVP.Value == 0 || KVP.Value == 7)) {
             return true;
         }
         return false;
     }
-/*
-    private bool isXTile(KeyValuePair<int, int> KVP) {
-        if (KVP.Key == 1 && (KVP.Value == 1 || KVP.Value == 6)) {
-            return true;
-        }
-        else if (KVP.Key == 6 && (KVP.Value == 1 || KVP.Value == 6)) {
-            return true;
-        }
-        return false;
-    }
-
-    private bool isCTile(KeyValuePair<int, int> KVP) {
-        if (KVP.Key == 0 && (KVP.Value == 1 || KVP.Value == 6)) {
-            return true;
-        }
-        else if (KVP.Key == 7 && (KVP.Value == 1 || KVP.Value == 6)) {
-            return true;
-        }
-        return false;
-    }
-
-    private bool isSweet16(KeyValuePair<int, int> KVP) {
-        if (KVP.Key < 2 || KVP.Key > 5) {
+    /*
+        private bool isXTile(KeyValuePair<int, int> KVP) {
+            if (KVP.Key == 1 && (KVP.Value == 1 || KVP.Value == 6)) {
+                return true;
+            }
+            else if (KVP.Key == 6 && (KVP.Value == 1 || KVP.Value == 6)) {
+                return true;
+            }
             return false;
         }
-        if (KVP.Value < 2 || KVP.Value > 5) {
+
+        private bool isCTile(KeyValuePair<int, int> KVP) {
+            if (KVP.Key == 0 && (KVP.Value == 1 || KVP.Value == 6)) {
+                return true;
+            }
+            else if (KVP.Key == 7 && (KVP.Value == 1 || KVP.Value == 6)) {
+                return true;
+            }
             return false;
         }
-        return true;
-    }
-    */ // Tests that are no longer needed
-    // THIS ASSUMES THAT BLACK HAS EVEN TURN # AND WHITE HAS ODD
+
+        private bool isSweet16(KeyValuePair<int, int> KVP) {
+            if (KVP.Key < 2 || KVP.Key > 5) {
+                return false;
+            }
+            if (KVP.Value < 2 || KVP.Value > 5) {
+                return false;
+            }
+            return true;
+        }
+        */ // Tests that are no longer needed
+           // THIS ASSUMES THAT BLACK HAS EVEN TURN # AND WHITE HAS ODD
     private bool CompletesEdge(KeyValuePair<int, int> KVP, uint turn) {
         BoardSpace color = (turn % 2 == 0) ? BoardSpace.BLACK : BoardSpace.WHITE;
         // Check if its on an edge
@@ -414,16 +437,18 @@ public class NaiveBehavior : AIScript {
 
     private bool CheckSameColor(BoardSpace[][] board, KeyValuePair<int, int> KVP, BoardSpace color) {
         int edge = -1; // -1 = NULL; 0 = SOUTH; 1 = EAST; 2 = NORTH; 3 = WEST;
-        int doubleEdge = -1; 
+        int doubleEdge = -1;
         if (isCorner(KVP)) {
             if (KVP.Key == 0) {
                 edge = 3;
                 if (KVP.Value == 0) {
                     doubleEdge = 0;
-                } else {
+                }
+                else {
                     doubleEdge = 2;
                 }
-            } else {
+            }
+            else {
                 edge = 1;
                 if (KVP.Value == 0) {
                     doubleEdge = 0;
@@ -432,14 +457,18 @@ public class NaiveBehavior : AIScript {
                     doubleEdge = 2;
                 }
             }
-        } else {
+        }
+        else {
             if (KVP.Key == 0) {
                 edge = 3;
-            } else if (KVP.Key == 7) {
+            }
+            else if (KVP.Key == 7) {
                 edge = 1;
-            } else if (KVP.Value == 0) {
+            }
+            else if (KVP.Value == 0) {
                 edge = 0;
-            } else if (KVP.Value == 7) {
+            }
+            else if (KVP.Value == 7) {
                 edge = 2;
             }
         }
@@ -454,7 +483,8 @@ public class NaiveBehavior : AIScript {
                     if (board[j][0] != color) {
                         if (doubleEdge > -1) {
                             break;
-                        } else {
+                        }
+                        else {
                             return false;
                         }
                     }
@@ -545,7 +575,7 @@ public class NaiveBehavior : AIScript {
                 }
             }
         }
-        
+
         return true;
     }
 }

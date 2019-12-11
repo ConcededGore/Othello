@@ -79,7 +79,7 @@ public class BoardScript : MonoBehaviour {
 
         possibleMovesArray = new List<GameObject>();
         if (isPlayerOneAI) {
-            System.Type scriptType = System.Reflection.Assembly.GetExecutingAssembly().GetType("NaiveBehavior");
+            System.Type scriptType = System.Reflection.Assembly.GetExecutingAssembly().GetType("SmartBehavior");
             //System.Type scriptType = System.Reflection.Assembly.GetExecutingAssembly().GetType(playerOneScriptClassName);
             System.Object o = Activator.CreateInstance(scriptType);
             playerOneScript = (AIScript)o;
