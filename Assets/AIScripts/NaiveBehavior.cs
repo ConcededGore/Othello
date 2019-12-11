@@ -21,7 +21,12 @@ public class NaiveBehavior : AIScript {
         foreach (KeyValuePair<int, int> n in availableMoves)
         {
             Debug.Log("iteration start");
-            BoardSpace[][] nodeCopy = (BoardSpace[][])board.Clone();
+            BoardSpace[][] nodeCopy = new BoardSpace[8][];
+            System.Array.Copy(currBoard, nodeCopy, 8);
+            for(int x = 0; x < 8; x++)
+            {
+                System.Array.Copy(currBoard[x], nodeCopy[x], 8);
+            }
             if (colorNum == -1)
                 nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
             else
@@ -68,7 +73,12 @@ public class NaiveBehavior : AIScript {
             //go through each valid move for this board state
             foreach (KeyValuePair<int, int> n in BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber()))
             {
-                BoardSpace[][] nodeCopy = (BoardSpace[][])node.Clone();
+                BoardSpace[][] nodeCopy = new BoardSpace[8][];
+                System.Array.Copy(node, nodeCopy, 8);
+                for (int x = 0; x < 8; x++)
+                {
+                    System.Array.Copy(node[x], nodeCopy[x], 8);
+                }
                 if (color == -1)
                     nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
                 else
