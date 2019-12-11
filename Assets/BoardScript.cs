@@ -189,6 +189,7 @@ public class BoardScript : MonoBehaviour {
     }
 
     public void PlacePiece(int x, int y) { //instantiate piece at position and add to that side's points
+        Debug.Log("Instantiating at x:" + x + " y:" + y);
         GameObject piece = Instantiate(piecePrefab, transform);
         SpriteRenderer spriteR = piece.GetComponent<SpriteRenderer>();
         piece.transform.localPosition = new Vector3((float)x - 3.5f, (float)y - 3.5f, 0f);
@@ -242,12 +243,12 @@ public class BoardScript : MonoBehaviour {
         ++turnNumber;
     }
 
-    public static List<KeyValuePair<int, int>> GetPointsChangedFromMove(BoardSpace[][] board, uint turnNumber, int x, int y) {
+    public static List<KeyValuePair<int, int>> GetPointsChangedFromMove(BoardSpace[][] _board, uint turnNumber, int x, int y) {
         //determines how much a move changed the overall point value
         BoardSpace enemyColor = turnNumber % 2 == 0 ? BoardSpace.WHITE : BoardSpace.BLACK;
         BoardSpace ourColor = turnNumber % 2 == 0 ? BoardSpace.BLACK : BoardSpace.WHITE;
-        //Debug.Log(board.Length + " " + board[0].Length + " " + board[y][x]  + " " + y + " " + x);
-        if (board.Length != 8 || board[0].Length != 8 || y < 0 || y >= 8 || x < 0 || x >= 8 || board[y][x] != ourColor) {
+        //Debug.Log(_board.Length + " " + _board[0].Length + " " + _board[y][x]  + " " + y + " " + x);
+        if (_board.Length != 8 || _board[0].Length != 8 || y < 0 || y >= 8 || x < 0 || x >= 8 || _board[y][x] != ourColor) {
             return null;
         }
 
@@ -255,12 +256,12 @@ public class BoardScript : MonoBehaviour {
 
         for (int k = -1; k < 2; ++k) {
             for (int l = -1; l < 2; ++l) {
-                if (!((k == 0 && l == 0) || k + y < 0 || k + y >= 8 || l + x < 0 || l + x >= 8) && board[k + y][l + x] == enemyColor) {
+                if (!((k == 0 && l == 0) || k + y < 0 || k + y >= 8 || l + x < 0 || l + x >= 8) && _board[k + y][l + x] == enemyColor) {
                     int multiplier = 2;
                     while (k * multiplier + y >= 0 && k * multiplier + y < 8 && l * multiplier + x >= 0 && l * multiplier + x < 8) {
-                        if (board[k * multiplier + y][l * multiplier + x] == BoardSpace.EMPTY) {
+                        if (_board[k * multiplier + y][l * multiplier + x] == BoardSpace.EMPTY) {
                             break;
-                        } else if (board[k * multiplier + y][l * multiplier + x] == ourColor) {
+                        } else if (_board[k * multiplier + y][l * multiplier + x] == ourColor) {
                             for(int i = multiplier - 1; i >= 1; --i) {
                                 changedSpaces.Add(new KeyValuePair<int, int>(k * i + y, l * i + x));
                             }
@@ -280,8 +281,8 @@ public class BoardScript : MonoBehaviour {
         return staticTurnNumber;
     }
 
-    public static List<KeyValuePair<int, int>> GetValidMoves(BoardSpace[][] board, uint turnNumber) {
-        if(board.Length != 8 || board[0].Length != 8) {
+    public static List<KeyValuePair<int, int>> GetValidMoves(BoardSpace[][] _board, uint turnNumber) {
+        if(_board.Length != 8 || _board[0].Length != 8) {
             return null;
         }
         //determines the places that either player can move
@@ -289,17 +290,17 @@ public class BoardScript : MonoBehaviour {
 
         for(int i = 0; i < 8; ++i) {
             for(int j = 0; j < 8; ++j) {
-                if (board[i][j] == BoardSpace.EMPTY) {
+                if (_board[i][j] == BoardSpace.EMPTY) {
                     BoardSpace enemyColor = turnNumber % 2 == 0 ? BoardSpace.WHITE : BoardSpace.BLACK;
                     BoardSpace ourColor = turnNumber % 2 == 0 ? BoardSpace.BLACK : BoardSpace.WHITE;
                     for (int k = -1; k < 2; ++k) {
                         for (int l = -1; l < 2; ++l) {
-                            if (!((k == 0 && l == 0) || k + i < 0 || k + i >= 8 || l + j < 0 || l + j >= 8) && board[k + i][l + j] == enemyColor) {
+                            if (!((k == 0 && l == 0) || k + i < 0 || k + i >= 8 || l + j < 0 || l + j >= 8) && _board[k + i][l + j] == enemyColor) {
                                 int multiplier = 2;
                                 while (k * multiplier + i >= 0 && k * multiplier + i < 8 && l * multiplier + j >= 0 && l * multiplier + j < 8) {
-                                    if (board[k * multiplier + i][l * multiplier + j] == BoardSpace.EMPTY) {
+                                    if (_board[k * multiplier + i][l * multiplier + j] == BoardSpace.EMPTY) {
                                         break;
-                                    } else if (board[k * multiplier + i][l * multiplier + j] == ourColor) {
+                                    } else if (_board[k * multiplier + i][l * multiplier + j] == ourColor) {
                                         possibleMoves.Add(new KeyValuePair<int, int>(i, j));
                                         k = 2;
                                         l = 2;

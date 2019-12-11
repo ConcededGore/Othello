@@ -22,9 +22,9 @@ public class NaiveBehavior : AIScript {
         {
             Debug.Log("iteration start");
             BoardSpace[][] nodeCopy = new BoardSpace[8][];
-            System.Array.Copy(currBoard, nodeCopy, 8);
             for(int x = 0; x < 8; x++)
             {
+                nodeCopy[x] = new BoardSpace[8];
                 System.Array.Copy(currBoard[x], nodeCopy[x], 8);
             }
             if (colorNum == -1)
@@ -34,7 +34,7 @@ public class NaiveBehavior : AIScript {
 
             //simulate the changes the move would result in
             List<KeyValuePair<int, int>> simulatedChanges = BoardScript.GetPointsChangedFromMove(nodeCopy, BoardScript.GetTurnNumber(), n.Key, n.Value);
-            Debug.Log(simulatedChanges);
+            //Debug.Log(simulatedChanges);
             foreach (KeyValuePair<int, int> spot in simulatedChanges)
             {
                 if (nodeCopy[n.Value][n.Key] == BoardSpace.BLACK)
@@ -42,7 +42,7 @@ public class NaiveBehavior : AIScript {
                 else
                     nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
             }
-            Debug.Log("starting negamax traversal");
+            //Debug.Log("starting negamax traversal");
             int value = negamax(nodeCopy, 0, colorNum);
             if (value >= bestScore)
                 best = n;
@@ -53,7 +53,7 @@ public class NaiveBehavior : AIScript {
 
     private int negamax(BoardSpace[][] node, uint depth, int color)
     {
-        Debug.Log("negamax function start");
+        //Debug.Log("negamax function start");
         if (depth == maxDepth - 2)
         {
             int retVal = -1000000;
@@ -74,9 +74,9 @@ public class NaiveBehavior : AIScript {
             foreach (KeyValuePair<int, int> n in BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber()))
             {
                 BoardSpace[][] nodeCopy = new BoardSpace[8][];
-                System.Array.Copy(node, nodeCopy, 8);
                 for (int x = 0; x < 8; x++)
                 {
+                    nodeCopy[x] = new BoardSpace[8];
                     System.Array.Copy(node[x], nodeCopy[x], 8);
                 }
                 if (color == -1)
