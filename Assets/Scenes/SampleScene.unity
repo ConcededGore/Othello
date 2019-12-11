@@ -794,6 +794,11 @@ PrefabInstance:
       propertyPath: bText
       value: 
       objectReference: {fileID: 728551264}
+    - target: {fileID: 114610810491342564, guid: c1df6e61daa74ed4ebee0b9f869ebcbb,
+        type: 3}
+      propertyPath: aiToUseFor2
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4376452011989050, guid: c1df6e61daa74ed4ebee0b9f869ebcbb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
