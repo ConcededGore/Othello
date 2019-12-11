@@ -67,8 +67,9 @@ public class BoardScript : MonoBehaviour {
         //aiToUseFor1 = 0;
         isPlayerTwoAI = true;
         //aiToUseFor2 = 1;
+        Debug.Log("AI for one is: " + aiToUseFor1);
+        Debug.Log("AI for two is: " + aiToUseFor2);
 
-        
 
         /* For the calls to System.Reflection.Assembly.GetExecutingAssembly() below, enter the
          * string that names your .cs module that contains your AI code, such as is shown here
@@ -189,7 +190,7 @@ public class BoardScript : MonoBehaviour {
     }
 
     public void PlacePiece(int x, int y) { //instantiate piece at position and add to that side's points
-        Debug.Log("Instantiating at x:" + x + " y:" + y);
+        //Debug.Log("Instantiating at x:" + x + " y:" + y);
         GameObject piece = Instantiate(piecePrefab, transform);
         SpriteRenderer spriteR = piece.GetComponent<SpriteRenderer>();
         piece.transform.localPosition = new Vector3((float)x - 3.5f, (float)y - 3.5f, 0f);

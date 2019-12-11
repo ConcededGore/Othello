@@ -12,150 +12,314 @@ public class NaiveBehavior : AIScript {
     public override KeyValuePair<int, int> makeMove(List<KeyValuePair<int, int>> availableMoves, BoardSpace[][] currBoard) {
         board = currBoard;
 
-        if (color == BoardSpace.BLACK)
-            colorNum = -1;
-        else
-            colorNum = 1;
-        KeyValuePair<int, int> best;
-        int bestScore = -100000000;
-        foreach (KeyValuePair<int, int> n in availableMoves)
-        {
-            Debug.Log("iteration start");
-            BoardSpace[][] nodeCopy = new BoardSpace[8][];
-            for(int x = 0; x < 8; x++)
-            {
-                nodeCopy[x] = new BoardSpace[8];
-                System.Array.Copy(currBoard[x], nodeCopy[x], 8);
-            }
-            if (colorNum == -1)
-                nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
-            else
-                nodeCopy[n.Value][n.Key] = BoardSpace.WHITE;
-
-            //simulate the changes the move would result in
-            List<KeyValuePair<int, int>> simulatedChanges = BoardScript.GetPointsChangedFromMove(nodeCopy, BoardScript.GetTurnNumber(), n.Key, n.Value);
-            //Debug.Log(simulatedChanges);
-            foreach (KeyValuePair<int, int> spot in simulatedChanges)
-            {
-                if (nodeCopy[n.Value][n.Key] == BoardSpace.BLACK)
-                    nodeCopy[n.Value][n.Key] = BoardSpace.WHITE;
-                else
-                    nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
-            }
-            //Debug.Log("starting negamax traversal");
-            int value = -1000000;
-            if(ai == 0)
-                value = negamax(nodeCopy, 0, colorNum);
-            else if(ai == 1)
-                value = negamaxAB(nodeCopy, 0, -100, 200, colorNum);
-            if (value >= bestScore)
-                best = n;
-        }
-        Debug.Log("best is x:" + best.Value + " y:" + best.Key);
+        if (color == BoardSpace.BLACK)
+
+            colorNum = -1;
+
+        else
+
+            colorNum = 1;
+
+        KeyValuePair<int, int> best;
+
+        int bestScore = -100000000;
+
+        foreach (KeyValuePair<int, int> n in availableMoves)
+
+        {
+
+            //Debug.Log("iteration start");
+
+            BoardSpace[][] nodeCopy = new BoardSpace[8][];
+
+            for(int x = 0; x < 8; x++)
+
+            {
+
+                nodeCopy[x] = new BoardSpace[8];
+
+                System.Array.Copy(currBoard[x], nodeCopy[x], 8);
+
+            }
+
+            if (colorNum == -1)
+
+                nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
+
+            else
+
+                nodeCopy[n.Value][n.Key] = BoardSpace.WHITE;
+
+
+
+            //simulate the changes the move would result in
+
+            List<KeyValuePair<int, int>> simulatedChanges = BoardScript.GetPointsChangedFromMove(nodeCopy, BoardScript.GetTurnNumber(), n.Key, n.Value);
+
+            //Debug.Log(simulatedChanges);
+
+            foreach (KeyValuePair<int, int> spot in simulatedChanges)
+
+            {
+
+                if (nodeCopy[n.Value][n.Key] == BoardSpace.BLACK)
+
+                    nodeCopy[n.Value][n.Key] = BoardSpace.WHITE;
+
+                else
+
+                    nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
+
+            }
+
+            //Debug.Log("starting negamax traversal");
+
+            int value = -1000000;
+
+            if(ai == 0 || ai == 2)
+                value = negamax(nodeCopy, 0, colorNum);
+
+            else if(ai == 1 || ai == 3)
+                value = negamaxAB(nodeCopy, 0, -100, 200, colorNum);
+
+            if (Mathf.Abs(bestScore - value) <= 30)
+            {
+                if (Random.value < .5)
+                    best = n;
+            }
+            else if (value >= bestScore)
+
+                best = n;
+
+        }
+
+        //Debug.Log("best is x:" + best.Value + " y:" + best.Key);
+
         return best;
     }
 
-    private int negamax(BoardSpace[][] node, uint depth, int color)
-    {
-        //Debug.Log("negamax function start");
-        if (depth == maxDepth - 2)
-        {
-            int retVal = -1000000;
-            List<KeyValuePair<int, int>> moves = BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber() + depth);
-
-            foreach(KeyValuePair<int,int> n in moves)
-            {
-                int temp = rateMoveSelect(moves, n);
-                if (temp > retVal)
-                    retVal = temp;
-            }
-            return retVal;
-        }
-        else
-        {
-            int value = -100000;
-            //go through each valid move for this board state
-            foreach (KeyValuePair<int, int> n in BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber() + depth))
-            {
-                BoardSpace[][] nodeCopy = new BoardSpace[8][];
-                for (int x = 0; x < 8; x++)
-                {
-                    nodeCopy[x] = new BoardSpace[8];
-                    System.Array.Copy(node[x], nodeCopy[x], 8);
-                }
-                if (color == -1)
-                    nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
-                else
-                    nodeCopy[n.Value][n.Key] = BoardSpace.WHITE;
-
-                //simulate the changes each move would result in
-                List<KeyValuePair<int, int>> simulatedChanges = BoardScript.GetPointsChangedFromMove(nodeCopy, BoardScript.GetTurnNumber() + depth, n.Key, n.Value);
-                foreach (KeyValuePair<int, int> spot in simulatedChanges)
-                {
-                    if (nodeCopy[spot.Value][spot.Key] == BoardSpace.BLACK)
-                        nodeCopy[spot.Value][spot.Key] = BoardSpace.WHITE;
-                    else
-                        nodeCopy[spot.Value][spot.Key] = BoardSpace.BLACK;
-                }
-                //recurse
-                value = Mathf.Max(value, -1 * negamax(nodeCopy, depth + 1, -1 * color));
-            }
-            return value;
-        }
+    private int negamax(BoardSpace[][] node, uint depth, int color)
+
+    {
+
+        //Debug.Log("negamax function start");
+
+        if (depth == maxDepth - 2)
+
+        {
+
+            int retVal = -1000000;
+
+            List<KeyValuePair<int, int>> moves = BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber() + depth);
+
+
+
+            foreach(KeyValuePair<int,int> n in moves)
+
+            {
+                int temp = -1000;
+                if (ai == 0)
+                    temp = rateMoveSelect(moves, n);
+                else if (ai == 2)
+                    temp = NaiveRateMoveSelect(moves, n);
+
+
+                if (temp > retVal)
+
+                    retVal = temp;
+
+            }
+
+            return retVal;
+
+        }
+
+        else
+
+        {
+
+            int value = -100000;
+
+            //go through each valid move for this board state
+
+            foreach (KeyValuePair<int, int> n in BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber() + depth))
+
+            {
+
+                BoardSpace[][] nodeCopy = new BoardSpace[8][];
+
+                for (int x = 0; x < 8; x++)
+
+                {
+
+                    nodeCopy[x] = new BoardSpace[8];
+
+                    System.Array.Copy(node[x], nodeCopy[x], 8);
+
+                }
+
+                if (color == -1)
+
+                    nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
+
+                else
+
+                    nodeCopy[n.Value][n.Key] = BoardSpace.WHITE;
+
+
+
+                //simulate the changes each move would result in
+
+                List<KeyValuePair<int, int>> simulatedChanges = BoardScript.GetPointsChangedFromMove(nodeCopy, BoardScript.GetTurnNumber() + depth, n.Key, n.Value);
+
+                foreach (KeyValuePair<int, int> spot in simulatedChanges)
+
+                {
+
+                    if (nodeCopy[spot.Value][spot.Key] == BoardSpace.BLACK)
+
+                        nodeCopy[spot.Value][spot.Key] = BoardSpace.WHITE;
+
+                    else
+
+                        nodeCopy[spot.Value][spot.Key] = BoardSpace.BLACK;
+
+                }
+
+                //recurse
+                int temp = -1 * negamax(nodeCopy, depth + 1, -1 * color);
+                //value = Mathf.Max(value, -1 * negamax(nodeCopy, depth + 1, -1 * color));
+                if (Mathf.Abs(temp - value) <= 30)
+                {
+                    if (Random.value < .5)
+                        value = temp;
+                }
+                else if (temp >= value)
+
+                    value = temp;
+
+            }
+
+            return value;
+
+        }
+
     }
 
-    private int negamaxAB(BoardSpace[][] node, uint depth, int alpha, int beta, int color)
-    {
-        //Debug.Log("negamax function start");
-        if (depth == maxDepth - 2)
-        {
-            int retVal = -1000000;
-            List<KeyValuePair<int, int>> moves = BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber() + depth);
-
-            foreach (KeyValuePair<int, int> n in moves)
-            {
-                int temp = rateMoveSelect(moves, n);
-                if (temp > retVal)
-                    retVal = temp;
-            }
-            return retVal;
-        }
-        else
-        {
-            int value = -100000;
-            //go through each valid move for this board state
-            List<KeyValuePair<int, int>> possibleMoves = BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber() + depth);
-            foreach (KeyValuePair<int, int> n in possibleMoves)
-            {
-                BoardSpace[][] nodeCopy = new BoardSpace[8][];
-                for (int x = 0; x < 8; x++)
-                {
-                    nodeCopy[x] = new BoardSpace[8];
-                    System.Array.Copy(node[x], nodeCopy[x], 8);
-                }
-                if (color == -1)
-                    nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
-                else
-                    nodeCopy[n.Value][n.Key] = BoardSpace.WHITE;
-
-                //simulate the changes each move would result in
-                List<KeyValuePair<int, int>> simulatedChanges = BoardScript.GetPointsChangedFromMove(nodeCopy, BoardScript.GetTurnNumber() + depth, n.Key, n.Value);
-                foreach (KeyValuePair<int, int> spot in simulatedChanges)
-                {
-                    if (nodeCopy[spot.Value][spot.Key] == BoardSpace.BLACK)
-                        nodeCopy[spot.Value][spot.Key] = BoardSpace.WHITE;
-                    else
-                        nodeCopy[spot.Value][spot.Key] = BoardSpace.BLACK;
-                }
-                //recurse
-                value = Mathf.Max(value, -1 * negamaxAB(nodeCopy, depth + 1, -1 * alpha, -1 * beta, -1 * color));
-                int a = alpha;
-                a = Mathf.Max(a, value);
-                if (a >= beta)
-                    break;
-            }
-            return value;
-        }
+    private int negamaxAB(BoardSpace[][] node, uint depth, int alpha, int beta, int color)
+
+    {
+
+        //Debug.Log("negamax function start");
+
+        if (depth == maxDepth - 2)
+
+        {
+
+            int retVal = -1000000;
+
+            List<KeyValuePair<int, int>> moves = BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber() + depth);
+
+
+
+            foreach (KeyValuePair<int, int> n in moves)
+
+            {
+
+                int temp = -1000;
+                if (ai == 1)
+                    temp = rateMoveSelect(moves, n);
+                else if (ai == 3)
+                    temp = NaiveRateMoveSelect(moves, n);
+
+                if (temp > retVal)
+
+                    retVal = temp;
+
+            }
+
+            return retVal;
+
+        }
+
+        else
+
+        {
+
+            int value = -100000;
+
+            //go through each valid move for this board state
+
+            List<KeyValuePair<int, int>> possibleMoves = BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber() + depth);
+
+            foreach (KeyValuePair<int, int> n in possibleMoves)
+
+            {
+
+                BoardSpace[][] nodeCopy = new BoardSpace[8][];
+
+                for (int x = 0; x < 8; x++)
+
+                {
+
+                    nodeCopy[x] = new BoardSpace[8];
+
+                    System.Array.Copy(node[x], nodeCopy[x], 8);
+
+                }
+
+                if (color == -1)
+
+                    nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
+
+                else
+
+                    nodeCopy[n.Value][n.Key] = BoardSpace.WHITE;
+
+
+
+                //simulate the changes each move would result in
+
+                List<KeyValuePair<int, int>> simulatedChanges = BoardScript.GetPointsChangedFromMove(nodeCopy, BoardScript.GetTurnNumber() + depth, n.Key, n.Value);
+
+                foreach (KeyValuePair<int, int> spot in simulatedChanges)
+
+                {
+
+                    if (nodeCopy[spot.Value][spot.Key] == BoardSpace.BLACK)
+
+                        nodeCopy[spot.Value][spot.Key] = BoardSpace.WHITE;
+
+                    else
+
+                        nodeCopy[spot.Value][spot.Key] = BoardSpace.BLACK;
+
+                }
+
+                //recurse
+                int temp = -1 * negamaxAB(nodeCopy, depth + 1, -1 * alpha, -1 * beta, -1 * color);
+                //value = Mathf.Max(value, -1 * negamaxAB(nodeCopy, depth + 1, -1 * alpha, -1 * beta, -1 * color));
+
+                if (Mathf.Abs(temp - value) <= 30)
+                {
+                    if (Random.value < .5)
+                        value = temp;
+                }
+                else if (temp >= value)
+                    value = temp;
+
+                int a = alpha;
+
+                a = Mathf.Max(a, value);
+
+                if (a >= beta)
+                    break;
+            }
+
+            return value;
+
+        }
+
     }
 
     public override void SetAI(int ai) {
