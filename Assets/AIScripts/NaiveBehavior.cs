@@ -165,6 +165,8 @@ public class NaiveBehavior : AIScript {
         highMoves -= lowMoves;
         int score = moveScores[move] - lowMoves;
 
+        if (highMoves == 0)
+            highMoves++;
         int temp = (100 * score / highMoves);
 
         temp = 100 - temp;
