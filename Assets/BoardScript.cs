@@ -44,8 +44,8 @@ public class BoardScript : MonoBehaviour {
     List<GameObject> possibleMovesArray;
     bool posMovesShown;
 
-    int aiToUseFor1 = 0;
-    int aiToUseFor2 = 0;
+    public int aiToUseFor1 = 0;
+    public int aiToUseFor2 = 0;
 
     void Awake() {
         //determines which side is player
@@ -64,9 +64,9 @@ public class BoardScript : MonoBehaviour {
          */
 
         isPlayerOneAI = false;
-        aiToUseFor1 = 0;
+        //aiToUseFor1 = 0;
         isPlayerTwoAI = true;
-        aiToUseFor2 = 0;
+        //aiToUseFor2 = 1;
 
         
 

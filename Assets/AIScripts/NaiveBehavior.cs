@@ -43,7 +43,11 @@ public class NaiveBehavior : AIScript {
                     nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
             }
             //Debug.Log("starting negamax traversal");
-            int value = negamax(nodeCopy, 0, colorNum);
+            int value = -1000000;
+            if(ai == 0)
+                value = negamax(nodeCopy, 0, colorNum);
+            else if(ai == 1)
+                value = negamaxAB(nodeCopy, 0, -100, 200, colorNum);
             if (value >= bestScore)
                 best = n;
         }
@@ -57,7 +61,7 @@ public class NaiveBehavior : AIScript {
         if (depth == maxDepth - 2)
         {
             int retVal = -1000000;
-            List<KeyValuePair<int, int>> moves = BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber() + maxDepth);
+            List<KeyValuePair<int, int>> moves = BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber() + depth);
 
             foreach(KeyValuePair<int,int> n in moves)
             {
@@ -71,7 +75,7 @@ public class NaiveBehavior : AIScript {
         {
             int value = -100000;
             //go through each valid move for this board state
-            foreach (KeyValuePair<int, int> n in BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber()))
+            foreach (KeyValuePair<int, int> n in BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber() + depth))
             {
                 BoardSpace[][] nodeCopy = new BoardSpace[8][];
                 for (int x = 0; x < 8; x++)
@@ -95,6 +99,60 @@ public class NaiveBehavior : AIScript {
                 }
                 //recurse
                 value = Mathf.Max(value, -1 * negamax(nodeCopy, depth + 1, -1 * color));
+            }
+            return value;
+        }
+    }
+
+    private int negamaxAB(BoardSpace[][] node, uint depth, int alpha, int beta, int color)
+    {
+        //Debug.Log("negamax function start");
+        if (depth == maxDepth - 2)
+        {
+            int retVal = -1000000;
+            List<KeyValuePair<int, int>> moves = BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber() + depth);
+
+            foreach (KeyValuePair<int, int> n in moves)
+            {
+                int temp = rateMoveSelect(moves, n);
+                if (temp > retVal)
+                    retVal = temp;
+            }
+            return retVal;
+        }
+        else
+        {
+            int value = -100000;
+            //go through each valid move for this board state
+            List<KeyValuePair<int, int>> possibleMoves = BoardScript.GetValidMoves(node, BoardScript.GetTurnNumber() + depth);
+            foreach (KeyValuePair<int, int> n in possibleMoves)
+            {
+                BoardSpace[][] nodeCopy = new BoardSpace[8][];
+                for (int x = 0; x < 8; x++)
+                {
+                    nodeCopy[x] = new BoardSpace[8];
+                    System.Array.Copy(node[x], nodeCopy[x], 8);
+                }
+                if (color == -1)
+                    nodeCopy[n.Value][n.Key] = BoardSpace.BLACK;
+                else
+                    nodeCopy[n.Value][n.Key] = BoardSpace.WHITE;
+
+                //simulate the changes each move would result in
+                List<KeyValuePair<int, int>> simulatedChanges = BoardScript.GetPointsChangedFromMove(nodeCopy, BoardScript.GetTurnNumber() + depth, n.Key, n.Value);
+                foreach (KeyValuePair<int, int> spot in simulatedChanges)
+                {
+                    if (nodeCopy[spot.Value][spot.Key] == BoardSpace.BLACK)
+                        nodeCopy[spot.Value][spot.Key] = BoardSpace.WHITE;
+                    else
+                        nodeCopy[spot.Value][spot.Key] = BoardSpace.BLACK;
+                }
+                //recurse
+                value = Mathf.Max(value, -1 * negamaxAB(nodeCopy, depth + 1, -1 * alpha, -1 * beta, -1 * color));
+                int a = alpha;
+                a = Mathf.Max(a, value);
+                if (a >= beta)
+                    break;
             }
             return value;
         }
